@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICO 缩放调节器 - 统一你的桌面图标</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .checkerboard-bg {
+            background-image: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gray-50 flex items-center justify-center p-6 font-sans">
+    <div class="max-w-xl w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 px-6 py-4 text-white">
+            <h1 class="text-xl font-semibold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                    <circle cx="9" cy="9" r="2" />
+                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                </svg>
+                ICO 缩放调节器
+            </h1>
+            <p class="text-blue-100 text-sm mt-1">上传、缩放、导出，轻松统一桌面图标视觉大小</p>
+        </div>
+
+        <div class="p-6 space-y-8">
+            <!-- Upload Area -->
+            <div id="upload-zone">
+                <label
+                    class="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg class="w-10 h-10 mb-3 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" x2="12" y1="3" y2="15" />
+                        </svg>
+                        <p class="mb-2 text-sm text-gray-500 font-medium">点击或拖拽上传图标文件</p>
+                        <p class="text-xs text-gray-400">支持 ICO,PNG, JPG等格式</p>
+                    </div>
+                    <input type="file" id="file-input" class="hidden" accept="image/*" />
+                </label>
+            </div>
+
+            <!-- Editor Area (Hidden initially) -->
+            <div id="editor-zone" class="hidden space-y-6">
+                <div class="flex justify-center">
+                    <div
+                        class="relative w-64 h-64 bg-gray-100 rounded-lg shadow-inner overflow-hidden flex items-center justify-center checkerboard-bg">
+                        <canvas id="main-canvas" width="256" height="256"
+                            class="absolute w-full h-full object-contain"></canvas>
+                        <!-- Reference Circle -->
+                        <div
+                            class="absolute inset-0 pointer-events-none border border-blue-400/30 border-dashed m-4 rounded-full flex items-center justify-center">
+                            <span class="text-blue-400/40 text-xs font-bold tracking-widest uppercase">参考圆</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm font-medium text-gray-700">图标缩放大小</label>
+                        <span id="scale-display"
+                            class="text-sm text-blue-600 font-mono bg-blue-50 px-2 py-1 rounded">100%</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-xs text-gray-400">小</span>
+                        <input type="range" id="scale-slider" min="0.1" max="3" step="0.01" value="1"
+                            class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+                        <span class="text-xs text-gray-400">大</span>
+                        <button id="reset-btn"
+                            class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                <path d="M3 3v5h5" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div
+                        class="flex items-start gap-2 mt-4 text-xs text-gray-500 bg-yellow-50/50 p-3 rounded-lg border border-yellow-100">
+                        <svg class="text-yellow-500 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" width="16"
+                            height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" x2="12" y1="8" y2="12" />
+                            <line x1="12" x2="12.01" y1="16" y2="16" />
+                        </svg>
+                        <p><strong>建议：</strong> 调整滑块直到图标主体接近虚线圆圈，这样生成的图标在任务栏上显示最均衡。</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 pt-2">
+                    <label
+                        class="flex-1 flex items-center justify-center gap-2 py-3 px-4 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors font-medium">
+                        更换图片
+                        <input type="file" id="re-upload-input" class="hidden" accept="image/*" />
+                    </label>
+                    <button id="download-btn"
+                        class="flex-[2] flex items-center justify-center gap-2 py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors shadow-sm shadow-blue-200 font-medium">
+                        保存并下载 ICO
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const reUploadInput = document.getElementById('re-upload-input');
+        const uploadZone = document.getElementById('upload-zone');
+        const editorZone = document.getElementById('editor-zone');
+        const canvas = document.getElementById('main-canvas');
+        const ctx = canvas.getContext('2d');
+        const scaleSlider = document.getElementById('scale-slider');
+        const scaleDisplay = document.getElementById('scale-display');
+        const resetBtn = document.getElementById('reset-btn');
+        const downloadBtn = document.getElementById('download-btn');
+
+        let currentImg = null;
+        let fileName = 'icon';
+
+        function handleFile(file) {
+            if (!file) return;
+            fileName = file.name.replace(/\.[^/.]+$/, "");
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    currentImg = img;
+                    uploadZone.classList.add('hidden');
+                    editorZone.classList.remove('hidden');
+                    render();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function render() {
+            if (!currentImg) return;
+            const scale = parseFloat(scaleSlider.value);
+            scaleDisplay.innerText = Math.round(scale * 100) + '%';
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const w = currentImg.width * scale;
+            const h = currentImg.height * scale;
+            const x = (canvas.width - w) / 2;
+            const y = (canvas.height - h) / 2;
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(currentImg, x, y, w, h);
+        }
+
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+        reUploadInput.onchange = (e) => handleFile(e.target.files[0]);
+        scaleSlider.oninput = render;
+        resetBtn.onclick = () => { scaleSlider.value = 1; render(); };
+
+        downloadBtn.onclick = async () => {
+            canvas.toBlob(async (blob) => {
+                const arrayBuffer = await blob.arrayBuffer();
+                const pngData = new Uint8Array(arrayBuffer);
+                const pngSize = pngData.length;
+
+                const buffer = new ArrayBuffer(22 + pngSize);
+                const view = new DataView(buffer);
+
+                // ICO Header
+                view.setUint16(0, 0, true);
+                view.setUint16(2, 1, true);
+                view.setUint16(4, 1, true);
+
+                // Directory Entry
+                view.setUint8(6, 0); // 256px
+                view.setUint8(7, 0); // 256px
+                view.setUint8(8, 0);
+                view.setUint8(9, 0);
+                view.setUint16(10, 1, true);
+                view.setUint16(12, 32, true);
+                view.setUint32(14, pngSize, true);
+                view.setUint32(18, 22, true);
+
+                const final = new Uint8Array(buffer);
+                final.set(pngData, 22);
+
+                const url = URL.createObjectURL(new Blob([final], { type: 'image/x-icon' }));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${fileName}_fixed.ico`;
+                a.click();
+            }, 'image/png');
+        };
+    </script>
+</body>
+
+</html>
