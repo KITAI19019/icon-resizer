@@ -13,10 +13,10 @@
 
 ### 📸 解决什么问题？
 如果你发现你的任务栏像这样：
-![](img\调整前.png)
+![](https://github.com/KITAI19019/icon-resizer/blob/main/img/%E8%B0%83%E6%95%B4%E5%89%8D.png?raw=true)
 
 使用本工具调整后：
-![](img\调整后.png)
+![](https://github.com/KITAI19019/icon-resizer/blob/main/img/%E8%B0%83%E6%95%B4%E5%90%8E.png?raw=true)
 
 ### 🛠️ 如何使用
 1. **上传**：将你想要修改的图标文件拖入上传区。
