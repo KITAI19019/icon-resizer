@@ -9,8 +9,6 @@
 - **原生导出**：直接生成标准的 256x256 `.ico` 格式，支持透明度。
 - **隐私安全**：所有图片处理均在本地浏览器 Canvas 完成，**不会上传到任何服务器**。
 
-**[点击这里立即使用你的 GitHub Pages 链接]**
-
 ### 📸 解决什么问题？
 如果你发现你的任务栏像这样：
 ![](https://github.com/KITAI19019/icon-resizer/blob/main/img/%E8%B0%83%E6%95%B4%E5%89%8D.png?raw=true)
